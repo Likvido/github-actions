@@ -2545,6 +2545,7 @@ async function run() {
         const dockerFilePath = core_1.getInput('docker-file-path');
         const dockerTarget = core_1.getInput('docker-target');
         const workingDirectory = core_1.getInput('working-directory');
+        const srcReplacement = core_1.getInput('src-replacement');
         const wd = process.cwd();
         process.chdir(workingDirectory);
         const workspacePath = process_1.env['GITHUB_WORKSPACE'];
@@ -2557,7 +2558,7 @@ async function run() {
         }
         res = shell.exec(`docker run -v ${testResultsPath}:/app/test-results ${imageName}`);
         //try to upload tests results before checking the code
-        const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, 'Tests Report', 30);
+        const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, 'Tests Report', 30, srcReplacement);
         await publish_results_1.publishResults(options);
         if (res.code !== 0) {
             core_1.setFailed(res.stderr);
@@ -15025,6 +15026,22 @@ const xml2js_1 = __webpack_require__(992);
 const glob_1 = __webpack_require__(281);
 const fs_1 = __webpack_require__(747);
 const path_1 = __webpack_require__(622);
+class SrcReplacement {
+    constructor(from, to) {
+        this.from = from;
+        this.to = to;
+    }
+    static Create(srcReplacement) {
+        if (srcReplacement == null || srcReplacement === '') {
+            return null;
+        }
+        const paths = srcReplacement.split('|');
+        if (paths.length !== 2) {
+            return null;
+        }
+        return new SrcReplacement(paths[0], paths[1]);
+    }
+}
 class Annotation {
     constructor(path, start_line, end_line, start_column, end_column, annotation_level, title, message, raw_details) {
         this.path = path;
@@ -15070,11 +15087,11 @@ function getLocation(stacktrace) {
     }
     return ['unknown', 0];
 }
-function testCaseAnnotation(testcase) {
+function testCaseAnnotation(testcase, srcReplacement = null) {
     const [filename, lineno] = 'stack-trace' in testcase.failure
         ? getLocation(testcase.failure['stack-trace'])
         : ['unknown', 0];
-    const sanitizedFilename = sanitizePath(filename);
+    const sanitizedFilename = sanitizePath(filename, srcReplacement);
     const message = testcase.failure.message;
     const classname = testcase.classname;
     const methodname = testcase.methodname;
@@ -15092,9 +15109,13 @@ class TestResult {
     }
 }
 exports.TestResult = TestResult;
-function sanitizePath(filename) {
+function sanitizePath(filename, srcReplacement) {
     if (filename.startsWith('/github/workspace'))
-        return path_1.relative('/github/workspace', filename);
+        return path_1.relative('/github/workspace', filename).replace(/\\/g, '/');
+    else if (srcReplacement != null)
+        return filename
+            .replace(/\\/g, '/')
+            .replace(srcReplacement.from, srcReplacement.to);
     else
         return path_1.relative(process.cwd(), filename).replace(/\\/g, '/');
 }
@@ -15116,7 +15137,7 @@ function getTestCases(testsuite) {
     }
     return testCases;
 }
-async function parseNunit(nunitReport) {
+async function parseNunit(nunitReport, srcReplacement = null) {
     const nunitResults = await xml2js_1.parseStringPromise(nunitReport, {
         trim: true,
         mergeAttrs: true,
@@ -15125,7 +15146,7 @@ async function parseNunit(nunitReport) {
     const testRun = nunitResults['test-run'];
     const testCases = getTestCases(testRun);
     const failedCases = testCases.filter(tc => tc.result === 'Failed');
-    const annotations = failedCases.map(testCaseAnnotation);
+    const annotations = failedCases.map(tc => testCaseAnnotation(tc, srcReplacement));
     return new TestResult(parseInt(testRun.passed), parseInt(testRun.failed), annotations);
 }
 exports.parseNunit = parseNunit;
@@ -15135,16 +15156,17 @@ function combine(result1, result2) {
     const annotations = result1.annotations.concat(result2.annotations);
     return new TestResult(passed, failed, annotations);
 }
-async function* resultGenerator(path) {
+async function* resultGenerator(path, srcReplacement) {
     const globber = await glob_1.create(path, { followSymbolicLinks: false });
     for await (const file of globber.globGenerator()) {
         const data = await fs_1.promises.readFile(file, 'utf8');
-        yield parseNunit(data);
+        yield parseNunit(data, srcReplacement);
     }
 }
-async function readResults(path) {
+async function readResults(path, srcReplacement = '') {
+    const replacement = SrcReplacement.Create(srcReplacement);
     let results = new TestResult(0, 0, []);
-    for await (const result of resultGenerator(path))
+    for await (const result of resultGenerator(path, replacement))
         results = combine(results, result);
     return results;
 }
@@ -16151,16 +16173,17 @@ function generateSummary(annotation) {
     return `* ${annotation.title}\n   ${annotation.message}`;
 }
 class UploadOptions {
-    constructor(path, access_token, title, num_failures) {
+    constructor(path, access_token, title, num_failures, srcReplacement) {
         this.path = path;
         this.access_token = access_token;
         this.title = title;
         this.num_failures = num_failures;
+        this.srcReplacement = srcReplacement;
     }
 }
 exports.UploadOptions = UploadOptions;
 async function publishResults(options) {
-    const results = await nunit_1.readResults(options.path);
+    const results = await nunit_1.readResults(options.path, options.srcReplacement);
     const octokit = github_1.getOctokit(options.access_token);
     const summary = results.failed > 0
         ? `${results.failed} tests failed`

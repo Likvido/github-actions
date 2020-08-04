@@ -18,6 +18,10 @@ inputs:
     description: 'working directory'
     required: false
     default: '.'
+  src-replacement:
+    description: "Indicates file path adjustement to match source control useful for docker build"
+    required: false
+    default: ""
 runs:
   using: 'node12'
   main: 'dist/index.js'

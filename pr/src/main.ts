@@ -11,6 +11,7 @@ async function run(): Promise<void> {
     const dockerFilePath = getInput('docker-file-path')
     const dockerTarget = getInput('docker-target')
     const workingDirectory = getInput('working-directory')
+    const srcReplacement = getInput('src-replacement')
 
     const wd = process.cwd()
     process.chdir(workingDirectory)
@@ -36,7 +37,8 @@ async function run(): Promise<void> {
       `${testResultsPath}/*.xml`,
       accessToken,
       'Tests Report',
-      30
+      30,
+      srcReplacement
     )
     await publishResults(options)
 
