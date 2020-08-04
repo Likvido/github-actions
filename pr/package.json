@@ -10,7 +10,7 @@
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
     "package": "ncc build --source-map",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
   "repository": {
@@ -25,11 +25,14 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "1.2.4"
+    "@actions/core": "1.2.4",
+    "nunit-result": "github:boychenko/nunit-reporter#build",
+    "shelljs": "0.8.4"
   },
   "devDependencies": {
     "@types/jest": "26.0.8",
     "@types/node": "14.0.27",
+    "@types/shelljs": "0.8.8",
     "@typescript-eslint/parser": "3.8.0",
     "@zeit/ncc": "0.22.3",
     "eslint": "7.6.0",
@@ -39,7 +42,7 @@
     "jest-circus": "26.2.2",
     "js-yaml": "3.14.0",
     "prettier": "2.0.5",
-    "ts-jest": "24.3.0",
+    "ts-jest": "26.1.4",
     "typescript": "3.9.7"
   }
 }
