@@ -2544,6 +2544,9 @@ async function run() {
         const imageName = core_1.getInput('image-name');
         const dockerFilePath = core_1.getInput('docker-file-path');
         const dockerTarget = core_1.getInput('docker-target');
+        const workingDirectory = core_1.getInput('working-directory');
+        const wd = process.cwd();
+        process.chdir(workingDirectory);
         const workspacePath = process_1.env['GITHUB_WORKSPACE'];
         const testResultsPath = `${workspacePath}/test-results`;
         fs.mkdirSync(testResultsPath);
@@ -2553,12 +2556,14 @@ async function run() {
             return;
         }
         res = shell.exec(`docker run -v ${testResultsPath}:/app/test-results ${imageName}`);
+        //try to upload tests results before checking the code
+        const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, 'Tests Report', 30);
+        await publish_results_1.publishResults(options);
         if (res.code !== 0) {
             core_1.setFailed(res.stderr);
             return;
         }
-        const options = new publish_results_1.UploadOptions(testResultsPath, accessToken, 'Tests Report', 30);
-        await publish_results_1.publishResults(options);
+        process.chdir(wd);
     }
     catch (error) {
         core_1.setFailed(error.message);

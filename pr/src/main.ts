@@ -10,6 +10,10 @@ async function run(): Promise<void> {
     const imageName = getInput('image-name')
     const dockerFilePath = getInput('docker-file-path')
     const dockerTarget = getInput('docker-target')
+    const workingDirectory = getInput('working-directory')
+
+    const wd = process.cwd()
+    process.chdir(workingDirectory)
 
     const workspacePath = env['GITHUB_WORKSPACE']
     const testResultsPath = `${workspacePath}/test-results`
@@ -22,21 +26,26 @@ async function run(): Promise<void> {
       setFailed(res.stderr)
       return
     }
+
     res = shell.exec(
       `docker run -v ${testResultsPath}:/app/test-results ${imageName}`
     )
-    if (res.code !== 0) {
-      setFailed(res.stderr)
-      return
-    }
 
+    //try to upload tests results before checking the code
     const options = new UploadOptions(
-      testResultsPath,
+      `${testResultsPath}/*.xml`,
       accessToken,
       'Tests Report',
       30
     )
     await publishResults(options)
+
+    if (res.code !== 0) {
+      setFailed(res.stderr)
+      return
+    }
+
+    process.chdir(wd)
   } catch (error) {
     setFailed(error.message)
   }
