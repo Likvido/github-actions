@@ -13,6 +13,7 @@ async function run(): Promise<void> {
     const dockerTarget = getInput('docker-target')
     const workingDirectory = getInput('working-directory')
     const srcReplacement = getInput('src-replacement')
+    const testReportName = getInput('tests-report-name')
 
     process.chdir(workingDirectory)
 
@@ -36,7 +37,7 @@ async function run(): Promise<void> {
     const options = new UploadOptions(
       `${testResultsPath}/*.xml`,
       accessToken,
-      'PR Tests Report',
+      testReportName,
       30,
       srcReplacement
     )

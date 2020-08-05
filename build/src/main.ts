@@ -1,6 +1,5 @@
 import {setFailed, getInput} from '@actions/core'
 import {env} from 'process'
-import * as fs from 'fs'
 import * as shell from 'shelljs'
 import {publishResults, UploadOptions} from 'nunit-result/src/publish-results'
 
@@ -82,6 +81,7 @@ async function uploadTestResults(): Promise<void> {
   const testsLabel = getInput('tests-label')
   const accessToken = getInput('access-token')
   const srcReplacement = getInput('src-replacement')
+  const testReportName = getInput('tests-report-name')
   const containerName = 'testcontainer'
   if (testsLabel == null || testsLabel === '') {
     return
@@ -95,10 +95,9 @@ async function uploadTestResults(): Promise<void> {
   }
   const workspacePath = env['GITHUB_WORKSPACE']
   const testResultsPath = `${workspacePath}/test-results`
-  fs.mkdirSync(testResultsPath)
 
   res = shell.exec(
-    `docker cp ${containerName}:/app/test-results ${testResultsPath}/`
+    `docker cp ${containerName}:/app/test-results ${testResultsPath}`
   )
   if (res.code !== 0) {
     throw new Error(res.stderr)
@@ -109,7 +108,7 @@ async function uploadTestResults(): Promise<void> {
   const options = new UploadOptions(
     `${testResultsPath}/*.xml`,
     accessToken,
-    'Build Tests Report',
+    testReportName,
     30,
     srcReplacement
   )

@@ -22,6 +22,9 @@ inputs:
     description: "Indicates file path adjustement to match source control useful for docker build"
     required: false
     default: ""
+  tests-report-name:
+    description: "Test report name"
+    required: true
 runs:
   using: 'node12'
   main: 'dist/index.js'

@@ -2547,6 +2547,7 @@ async function run() {
         const dockerTarget = core_1.getInput('docker-target');
         const workingDirectory = core_1.getInput('working-directory');
         const srcReplacement = core_1.getInput('src-replacement');
+        const testReportName = core_1.getInput('tests-report-name');
         process.chdir(workingDirectory);
         let res = shell.exec(`docker build -t ${imageName} --target ${dockerTarget} -f ${dockerFilePath} .`);
         if (res.code !== 0) {
@@ -2558,7 +2559,7 @@ async function run() {
         fs.mkdirSync(testResultsPath);
         res = shell.exec(`docker run -v ${testResultsPath}:/app/test-results ${imageName}`);
         //try to upload tests results before checking the code
-        const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, 'PR Tests Report', 30, srcReplacement);
+        const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, testReportName, 30, srcReplacement);
         await publish_results_1.publishResults(options);
         if (res.code !== 0) {
             core_1.setFailed(res.stderr);

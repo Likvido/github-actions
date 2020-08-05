@@ -44,6 +44,9 @@ inputs:
     description: "Label of an intermediate image where test results can be found"
     required: false
     default: "test=true"
+  tests-report-name:
+    description: "Test report name"
+    required: true
 runs:
   using: 'node12'
   main: 'dist/index.js'

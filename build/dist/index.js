@@ -2535,7 +2535,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = __webpack_require__(470);
 const process_1 = __webpack_require__(765);
-const fs = __importStar(__webpack_require__(747));
 const shell = __importStar(__webpack_require__(739));
 const publish_results_1 = __webpack_require__(736);
 async function run() {
@@ -2601,6 +2600,7 @@ async function uploadTestResults() {
     const testsLabel = core_1.getInput('tests-label');
     const accessToken = core_1.getInput('access-token');
     const srcReplacement = core_1.getInput('src-replacement');
+    const testReportName = core_1.getInput('tests-report-name');
     const containerName = 'testcontainer';
     if (testsLabel == null || testsLabel === '') {
         return;
@@ -2611,13 +2611,12 @@ async function uploadTestResults() {
     }
     const workspacePath = process_1.env['GITHUB_WORKSPACE'];
     const testResultsPath = `${workspacePath}/test-results`;
-    fs.mkdirSync(testResultsPath);
-    res = shell.exec(`docker cp ${containerName}:/app/test-results ${testResultsPath}/`);
+    res = shell.exec(`docker cp ${containerName}:/app/test-results ${testResultsPath}`);
     if (res.code !== 0) {
         throw new Error(res.stderr);
     }
     shell.exec(`docker rm ${containerName}`); //ignore if error
-    const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, 'Build Tests Report', 30, srcReplacement);
+    const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, testReportName, 30, srcReplacement);
     await publish_results_1.publishResults(options);
 }
 run();
