@@ -6809,7 +6809,7 @@ function _objectSpread2(target) {
   return target;
 }
 
-const VERSION = "3.1.1";
+const VERSION = "3.1.2";
 
 class Octokit {
   constructor(options = {}) {
@@ -16258,7 +16258,7 @@ async function publishResults(options) {
     const pr = github_1.context.payload.pull_request;
     await octokit.checks.create({
         head_sha: (pr && pr['head'] && pr['head'].sha) || github_1.context.sha,
-        name: 'Tests Report',
+        name: options.title,
         owner: github_1.context.repo.owner,
         repo: github_1.context.repo.repo,
         status: 'completed',
