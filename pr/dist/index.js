@@ -2539,6 +2539,7 @@ const fs = __importStar(__webpack_require__(747));
 const shell = __importStar(__webpack_require__(739));
 const publish_results_1 = __webpack_require__(736);
 async function run() {
+    const wd = process.cwd();
     try {
         const accessToken = core_1.getInput('access-token');
         const imageName = core_1.getInput('image-name');
@@ -2546,16 +2547,15 @@ async function run() {
         const dockerTarget = core_1.getInput('docker-target');
         const workingDirectory = core_1.getInput('working-directory');
         const srcReplacement = core_1.getInput('src-replacement');
-        const wd = process.cwd();
         process.chdir(workingDirectory);
-        const workspacePath = process_1.env['GITHUB_WORKSPACE'];
-        const testResultsPath = `${workspacePath}/test-results`;
-        fs.mkdirSync(testResultsPath);
         let res = shell.exec(`docker build -t ${imageName} --target ${dockerTarget} -f ${dockerFilePath} .`);
         if (res.code !== 0) {
             core_1.setFailed(res.stderr);
             return;
         }
+        const workspacePath = process_1.env['GITHUB_WORKSPACE'];
+        const testResultsPath = `${workspacePath}/test-results`;
+        fs.mkdirSync(testResultsPath);
         res = shell.exec(`docker run -v ${testResultsPath}:/app/test-results ${imageName}`);
         //try to upload tests results before checking the code
         const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, 'Tests Report', 30, srcReplacement);
@@ -2564,10 +2564,12 @@ async function run() {
             core_1.setFailed(res.stderr);
             return;
         }
-        process.chdir(wd);
     }
     catch (error) {
         core_1.setFailed(error.message);
+    }
+    finally {
+        process.chdir(wd);
     }
 }
 run();

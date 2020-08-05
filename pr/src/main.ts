@@ -5,6 +5,7 @@ import * as shell from 'shelljs'
 import {publishResults, UploadOptions} from 'nunit-result/src/publish-results'
 
 async function run(): Promise<void> {
+  const wd = process.cwd()
   try {
     const accessToken = getInput('access-token')
     const imageName = getInput('image-name')
@@ -13,12 +14,7 @@ async function run(): Promise<void> {
     const workingDirectory = getInput('working-directory')
     const srcReplacement = getInput('src-replacement')
 
-    const wd = process.cwd()
     process.chdir(workingDirectory)
-
-    const workspacePath = env['GITHUB_WORKSPACE']
-    const testResultsPath = `${workspacePath}/test-results`
-    fs.mkdirSync(testResultsPath)
 
     let res = shell.exec(
       `docker build -t ${imageName} --target ${dockerTarget} -f ${dockerFilePath} .`
@@ -27,6 +23,10 @@ async function run(): Promise<void> {
       setFailed(res.stderr)
       return
     }
+
+    const workspacePath = env['GITHUB_WORKSPACE']
+    const testResultsPath = `${workspacePath}/test-results`
+    fs.mkdirSync(testResultsPath)
 
     res = shell.exec(
       `docker run -v ${testResultsPath}:/app/test-results ${imageName}`
@@ -46,10 +46,10 @@ async function run(): Promise<void> {
       setFailed(res.stderr)
       return
     }
-
-    process.chdir(wd)
   } catch (error) {
     setFailed(error.message)
+  } finally {
+    process.chdir(wd)
   }
 }
 
