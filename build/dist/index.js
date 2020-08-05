@@ -2563,7 +2563,7 @@ async function run() {
             core_1.setFailed(res.stderr);
             return;
         }
-        res = shell.exec(`docker push {imageName}`);
+        res = shell.exec(`docker push ${imageName}`);
         if (res.code !== 0) {
             core_1.setFailed(res.stderr);
             return;

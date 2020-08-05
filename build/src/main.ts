@@ -37,7 +37,7 @@ async function run(): Promise<void> {
       return
     }
 
-    res = shell.exec(`docker push {imageName}`)
+    res = shell.exec(`docker push ${imageName}`)
     if (res.code !== 0) {
       setFailed(res.stderr)
       return
