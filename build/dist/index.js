@@ -2617,7 +2617,7 @@ async function uploadTestResults() {
         throw new Error(res.stderr);
     }
     shell.exec(`docker rm ${containerName}`); //ignore if error
-    const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, 'Tests Report', 30, srcReplacement);
+    const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, 'Build Tests Report', 30, srcReplacement);
     await publish_results_1.publishResults(options);
 }
 run();

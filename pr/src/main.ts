@@ -36,7 +36,7 @@ async function run(): Promise<void> {
     const options = new UploadOptions(
       `${testResultsPath}/*.xml`,
       accessToken,
-      'Tests Report',
+      'PR Tests Report',
       30,
       srcReplacement
     )

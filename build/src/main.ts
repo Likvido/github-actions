@@ -109,7 +109,7 @@ async function uploadTestResults(): Promise<void> {
   const options = new UploadOptions(
     `${testResultsPath}/*.xml`,
     accessToken,
-    'Tests Report',
+    'Build Tests Report',
     30,
     srcReplacement
   )

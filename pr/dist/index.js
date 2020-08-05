@@ -2558,7 +2558,7 @@ async function run() {
         fs.mkdirSync(testResultsPath);
         res = shell.exec(`docker run -v ${testResultsPath}:/app/test-results ${imageName}`);
         //try to upload tests results before checking the code
-        const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, 'Tests Report', 30, srcReplacement);
+        const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, 'PR Tests Report', 30, srcReplacement);
         await publish_results_1.publishResults(options);
         if (res.code !== 0) {
             core_1.setFailed(res.stderr);
