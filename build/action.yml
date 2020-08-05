@@ -1,5 +1,5 @@
-name: 'PR'
-description: 'PR build'
+name: 'Build'
+description: 'Builds docker image'
 author: 'Likvido'
 inputs:
   access-token:
@@ -11,20 +11,42 @@ inputs:
   docker-file-path:
     description: 'docker file path'
     required: true
-  docker-target:
-    description: 'docker target'
+  deployment-path:
+    description: 'kubernetes deployment file path'
     required: true
   working-directory:
     description: 'working directory'
     required: false
     default: '.'
+  principal-id:
+    description: 'azure service principal id for image upload'
+    required: true
+  principal-password:
+    description: 'azure service principal password for image upload'
+    required: true
+  principal-tenant:
+    description: 'azure service principal tenant id for image upload'
+    required: true
+  registry:
+    description: 'acr registry'
+    required: true
+  aks-cluster:
+    description: 'aks cluster name'
+    required: true
+  aks-cluster-resource-group:
+    description: 'aks cluster resource group name'
+    required: true
   src-replacement:
     description: "Indicates file path adjustement to match source control useful for docker build"
     required: false
     default: ""
+  tests-label:
+    description: "Label of an intermediate image where test results can be found"
+    required: false
+    default: "test=true"
 runs:
   using: 'node12'
   main: 'dist/index.js'
 branding:
-  icon: 'git-branch'  
+  icon: 'package'  
   color: 'orange'
