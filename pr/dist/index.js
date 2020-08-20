@@ -2558,6 +2558,9 @@ async function run() {
         const testResultsPath = `${workspacePath}/test-results`;
         fs.mkdirSync(testResultsPath);
         res = shell.exec(`docker run -v ${testResultsPath}:/app/test-results ${imageName}`);
+        if (testReportName == null || testReportName === '') {
+            return;
+        }
         //try to upload tests results before checking the code
         const options = new publish_results_1.UploadOptions(`${testResultsPath}/*.xml`, accessToken, testReportName, 30, srcReplacement);
         await publish_results_1.publishResults(options);
@@ -19961,7 +19964,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var request = __webpack_require__(753);
 var universalUserAgent = __webpack_require__(796);
 
-const VERSION = "4.5.3";
+const VERSION = "4.5.4";
 
 class GraphqlError extends Error {
   constructor(request, response) {

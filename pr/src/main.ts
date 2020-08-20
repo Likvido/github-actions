@@ -33,6 +33,10 @@ async function run(): Promise<void> {
       `docker run -v ${testResultsPath}:/app/test-results ${imageName}`
     )
 
+    if (testReportName == null || testReportName === '') {
+      return
+    }
+
     //try to upload tests results before checking the code
     const options = new UploadOptions(
       `${testResultsPath}/*.xml`,

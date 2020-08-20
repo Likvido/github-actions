@@ -24,7 +24,8 @@ inputs:
     default: ""
   tests-report-name:
     description: "Test report name"
-    required: true
+    required: false
+    default: ""
 runs:
   using: 'node12'
   main: 'dist/index.js'
