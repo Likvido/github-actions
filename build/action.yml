@@ -3,32 +3,32 @@ description: 'Builds docker image'
 author: 'Likvido'
 inputs:
   access-token:
-    description: 'github token'
+    description: 'github token is used to upload test result to github'
     required: true
   image-name:
-    description: 'image name'
+    description: 'docker image name'
     required: true
   docker-file-path:
-    description: 'docker file path'
+    description: 'path to a docker file'
     required: true
   deployment-path:
-    description: 'kubernetes deployment file path'
+    description: 'path toa a kubernetes deployment file'
     required: true
   working-directory:
-    description: 'working directory'
+    description: 'a base directory to be used to build docker image. Handy to simplify paths and reduce context size to be sent to docker'
     required: false
     default: '.'
   principal-id:
-    description: 'azure service principal id for image upload'
+    description: 'azure service principal id for a docker image upload'
     required: true
   principal-password:
-    description: 'azure service principal password for image upload'
+    description: 'azure service principal password for a docker image upload'
     required: true
   principal-tenant:
-    description: 'azure service principal tenant id for image upload'
+    description: 'azure service principal tenant id for a docker image upload'
     required: true
   registry:
-    description: 'acr registry'
+    description: 'azure container registry'
     required: true
   aks-cluster:
     description: 'aks cluster name'
@@ -37,16 +37,17 @@ inputs:
     description: 'aks cluster resource group name'
     required: true
   src-replacement:
-    description: "Indicates file path adjustement to match source control useful for docker build"
+    description: "Indicates file path adjustment to match source control useful for docker build. A source's path and build paths can become different. This option helps us with this problem"
     required: false
     default: ""
   tests-label:
-    description: "Label of an intermediate image where test results can be found"
+    description: "Label of an intermediate image where test results can be found. If an empty string is provided uploading is skipped"
     required: false
     default: "test=true"
   tests-report-name:
-    description: "Test report name"
-    required: true
+    description: "Test report name. Should be descriptive to allow different builds per PR/commit to upload their test results without overlapping. If an empty string is provided uploading is skipped"
+    required: false
+    default: ""
 runs:
   using: 'node12'
   main: 'dist/index.js'

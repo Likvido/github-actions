@@ -3,27 +3,27 @@ description: 'PR build'
 author: 'Likvido'
 inputs:
   access-token:
-    description: 'github token'
+    description: 'github token is used to upload test result to github'
     required: true
   image-name:
-    description: 'image name'
+    description: 'docker image name'
     required: true
   docker-file-path:
-    description: 'docker file path'
+    description: 'path to a docker file'
     required: true
   docker-target:
-    description: 'docker target'
+    description: 'docker target for tests execution. After build it should `docker run imageName` should perform tests if any'
     required: true
   working-directory:
-    description: 'working directory'
+    description: 'a base directory to be used to build docker image. Handy to simplify paths and reduce context size to be sent to docker'
     required: false
     default: '.'
   src-replacement:
-    description: "Indicates file path adjustement to match source control useful for docker build"
+    description: "Indicates file path adjustment to match source control useful for docker build. A source's path and build paths can become different. This option helps us with this problem"
     required: false
     default: ""
   tests-report-name:
-    description: "Test report name"
+    description: "Test report name. Should be descriptive to allow different builds per PR/commit to upload their test results without overlapping. If an empty string is provided uploading is skipped"
     required: false
     default: ""
 runs:

@@ -83,6 +83,10 @@ async function uploadTestResults(): Promise<void> {
   const srcReplacement = getInput('src-replacement')
   const testReportName = getInput('tests-report-name')
   const containerName = 'testcontainer'
+  if (testReportName == null || testReportName === '') {
+    return
+  }
+
   if (testsLabel == null || testsLabel === '') {
     return
   }
