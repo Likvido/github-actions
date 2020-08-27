@@ -25,7 +25,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "1.2.4",
+    "@actions/core": "1.2.5",
     "nunit-result": "github:boychenko/nunit-reporter#build",
     "shelljs": "0.8.4"
   },
