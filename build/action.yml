@@ -48,6 +48,10 @@ inputs:
     description: "Test report name. Should be descriptive to allow different builds per PR/commit to upload their test results without overlapping. If an empty string is provided uploading is skipped"
     required: false
     default: ""
+  skip-deployment:
+    description: "Makes it possible to skip the deployment step of the pipeline"
+    required: false
+    default: "false"
 runs:
   using: 'node12'
   main: 'dist/index.js'

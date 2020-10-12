@@ -2550,6 +2550,8 @@ async function run() {
         const registry = core_1.getInput('registry');
         const aksCluster = core_1.getInput('aks-cluster');
         const aksClusterResouceGroup = core_1.getInput('aks-cluster-resource-group');
+        const skipDeploymentString = core_1.getInput('skip-deployment');
+        const skipDeployment = skipDeploymentString === 'true' || skipDeploymentString === '1';
         process.chdir(workingDirectory);
         let res = shell.exec(`docker build -t ${imageName} -f ${dockerFilePath} .`);
         //try to upload tests results before checking the code
@@ -2583,8 +2585,8 @@ async function run() {
             core_1.setFailed(res.stderr);
             return;
         }
-        if (deploymentPath == null || deploymentPath === '') {
-            core_1.info('Deployment step skipped because \"deploymentPath\" wasn\'t provided');
+        if (skipDeployment) {
+            core_1.info('Deployment step skipped because of "skip-deployment" setting');
         }
         else {
             res = shell.exec(`kubectl apply -f ${deploymentPath} --record`);
@@ -2608,11 +2610,11 @@ async function uploadTestResults() {
     const testReportName = core_1.getInput('tests-report-name');
     const containerName = 'testcontainer';
     if (testReportName == null || testReportName === '') {
-        core_1.info('uploadTestResults step skipped because \"testReportName\" wasn\'t provided');
+        core_1.info('uploadTestResults step skipped because "testReportName" wasn\'t provided');
         return;
     }
     if (testsLabel == null || testsLabel === '') {
-        core_1.info('uploadTestResults step skipped because \"testsLabel\" wasn\'t provided');
+        core_1.info('uploadTestResults step skipped because "testsLabel" wasn\'t provided');
         return;
     }
     let res = shell.exec(`docker create --name ${containerName} $(docker images --filter "label=${testsLabel}" -q | head -1)`);

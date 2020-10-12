@@ -16,6 +16,9 @@ async function run(): Promise<void> {
     const registry = getInput('registry')
     const aksCluster = getInput('aks-cluster')
     const aksClusterResouceGroup = getInput('aks-cluster-resource-group')
+    const skipDeploymentString = getInput('skip-deployment')
+    const skipDeployment =
+      skipDeploymentString === 'true' || skipDeploymentString === '1'
 
     process.chdir(workingDirectory)
 
@@ -65,8 +68,8 @@ async function run(): Promise<void> {
       return
     }
 
-    if (deploymentPath == null || deploymentPath === '') {
-      info('Deployment step skipped because "deploymentPath" wasn\'t provided')
+    if (skipDeployment) {
+      info('Deployment step skipped because of "skip-deployment" setting')
     } else {
       res = shell.exec(`kubectl apply -f ${deploymentPath} --record`)
       if (res.code !== 0) {
