@@ -1,4 +1,4 @@
-import {setFailed, getInput} from '@actions/core'
+import {setFailed, getInput, info} from '@actions/core'
 import {env} from 'process'
 import * as shell from 'shelljs'
 import {publishResults, UploadOptions} from 'nunit-result/src/publish-results'
@@ -65,10 +65,14 @@ async function run(): Promise<void> {
       return
     }
 
-    res = shell.exec(`kubectl apply -f ${deploymentPath} --record`)
-    if (res.code !== 0) {
-      setFailed(res.stderr)
-      return
+    if (deploymentPath == null || deploymentPath === '') {
+      info('Deployment step skipped because "deploymentPath" wasn\'t provided')
+    } else {
+      res = shell.exec(`kubectl apply -f ${deploymentPath} --record`)
+      if (res.code !== 0) {
+        setFailed(res.stderr)
+        return
+      }
     }
   } catch (error) {
     setFailed(error.message)
@@ -84,10 +88,14 @@ async function uploadTestResults(): Promise<void> {
   const testReportName = getInput('tests-report-name')
   const containerName = 'testcontainer'
   if (testReportName == null || testReportName === '') {
+    info(
+      'uploadTestResults step skipped because "testReportName" wasn\'t provided'
+    )
     return
   }
 
   if (testsLabel == null || testsLabel === '') {
+    info('uploadTestResults step skipped because "testsLabel" wasn\'t provided')
     return
   }
 

@@ -2583,10 +2583,15 @@ async function run() {
             core_1.setFailed(res.stderr);
             return;
         }
-        res = shell.exec(`kubectl apply -f ${deploymentPath} --record`);
-        if (res.code !== 0) {
-            core_1.setFailed(res.stderr);
-            return;
+        if (deploymentPath == null || deploymentPath === '') {
+            core_1.info('Deployment step skipped because \"deploymentPath\" wasn\'t provided');
+        }
+        else {
+            res = shell.exec(`kubectl apply -f ${deploymentPath} --record`);
+            if (res.code !== 0) {
+                core_1.setFailed(res.stderr);
+                return;
+            }
         }
     }
     catch (error) {
@@ -2603,9 +2608,11 @@ async function uploadTestResults() {
     const testReportName = core_1.getInput('tests-report-name');
     const containerName = 'testcontainer';
     if (testReportName == null || testReportName === '') {
+        core_1.info('uploadTestResults step skipped because \"testReportName\" wasn\'t provided');
         return;
     }
     if (testsLabel == null || testsLabel === '') {
+        core_1.info('uploadTestResults step skipped because \"testsLabel\" wasn\'t provided');
         return;
     }
     let res = shell.exec(`docker create --name ${containerName} $(docker images --filter "label=${testsLabel}" -q | head -1)`);
