@@ -25,6 +25,10 @@ async function run(): Promise<void> {
       return
     }
 
+    if (testReportName == null || testReportName === '') {
+      return
+    }
+
     const workspacePath = env['GITHUB_WORKSPACE']
     const testResultsPath = `${workspacePath}/test-results`
     fs.mkdirSync(testResultsPath)
@@ -32,10 +36,6 @@ async function run(): Promise<void> {
     res = shell.exec(
       `docker run -v ${testResultsPath}:/app/test-results ${imageName}`
     )
-
-    if (testReportName == null || testReportName === '') {
-      return
-    }
 
     //try to upload tests results before checking the code
     const options = new UploadOptions(
