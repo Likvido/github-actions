@@ -30,7 +30,7 @@
     "shelljs": "0.8.4"
   },
   "devDependencies": {
-    "@types/jest": "26.0.16",
+    "@types/jest": "26.0.19",
     "@types/node": "14.14.13",
     "@types/shelljs": "0.8.8",
     "@typescript-eslint/parser": "4.9.1",
