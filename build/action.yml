@@ -12,8 +12,12 @@ inputs:
     description: 'path to a docker file'
     required: true
   deployment-path:
-    description: 'path toa a kubernetes deployment file'
+    description: 'path to a kubernetes deployment file'
     required: true
+  namespace:
+    description: 'kubernetes namespace'
+    required: false
+    default: "default"
   working-directory:
     description: 'a base directory to be used to build docker image. Handy to simplify paths and reduce context size to be sent to docker'
     required: false
