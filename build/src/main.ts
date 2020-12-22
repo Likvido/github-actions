@@ -1,7 +1,7 @@
-import { setFailed, getInput, info } from '@actions/core'
-import { env } from 'process'
+import {setFailed, getInput, info} from '@actions/core'
+import {env} from 'process'
 import * as shell from 'shelljs'
-import { publishResults, UploadOptions } from 'nunit-result/src/publish-results'
+import {publishResults, UploadOptions} from 'nunit-result/src/publish-results'
 
 async function run(): Promise<void> {
   const wd = process.cwd()
@@ -72,7 +72,9 @@ async function run(): Promise<void> {
     if (skipDeployment) {
       info('Deployment step skipped because of "skip-deployment" setting')
     } else {
-      res = shell.exec(`kubectl apply --namespace=${namespace} -f ${deploymentPath} --record`)
+      res = shell.exec(
+        `kubectl apply --namespace=${namespace} -f ${deploymentPath} --record`
+      )
       if (res.code !== 0) {
         setFailed(res.stderr)
         return
