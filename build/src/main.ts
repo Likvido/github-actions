@@ -9,6 +9,7 @@ async function run(): Promise<void> {
     const imageName = getInput('image-name')
     const dockerFilePath = getInput('docker-file-path')
     const deploymentPath = getInput('deployment-path')
+    const namespace = getInput('namespace')
     const workingDirectory = getInput('working-directory')
     const principalId = getInput('principal-id')
     const principalPassword = getInput('principal-password')
@@ -71,7 +72,9 @@ async function run(): Promise<void> {
     if (skipDeployment) {
       info('Deployment step skipped because of "skip-deployment" setting')
     } else {
-      res = shell.exec(`kubectl apply -f ${deploymentPath} --record`)
+      res = shell.exec(
+        `kubectl apply --namespace=${namespace} -f ${deploymentPath} --record`
+      )
       if (res.code !== 0) {
         setFailed(res.stderr)
         return
